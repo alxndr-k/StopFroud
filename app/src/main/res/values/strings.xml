@@ -2,6 +2,10 @@
 <resources>
 
     <string name="app_name">StopFraud</string>
+
     <string name="mail_loading">Loading…</string>
+    <string name="main_error">Oops, something bad happens...\\nTry again later.</string>
+
+    <string name="api_location_unavailable">Current location is unavailable</string>
 
 </resources>

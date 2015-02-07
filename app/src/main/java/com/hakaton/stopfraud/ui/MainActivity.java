@@ -16,20 +16,18 @@ public class MainActivity extends ActionBarActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.a_scan);
 
+        setContentView(R.layout.a_scan);
         Api.getStatus(mStatusCallback);
     }
 
     private Callback<Status> mStatusCallback = new Callback<Status>() {
         @Override
         public void success(Status status, Response response) {
-
         }
 
         @Override
         public void failure(RetrofitError error) {
-
         }
     };
 }
