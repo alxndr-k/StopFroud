@@ -8,7 +8,9 @@ import retrofit.http.Query;
 
 public interface Resources {
 
-    @GET("/point_status")
+    @GET("/point_status.json")
     void getPointStatus(@Query("long") double lon, @Query("lat") double lat, Callback<Status> callback);
 
+    @GET("/point_status.json")
+    void getPointStatus(Callback<Status> callback);
 }
