@@ -1,4 +1,4 @@
-package com.hakaton.stopfroud;
+package com.hakaton.stopfraud;
 
 import android.app.Application;
 
@@ -7,6 +7,7 @@ import android.app.Application;
  */
 public class App extends Application {
 
+    public static final String TAG = App.class.getSimpleName();
     public static App self;
 
     @Override

@@ -1,4 +1,4 @@
-package com.hakaton.stopfroud;
+package com.hakaton.stopfraud;
 
 import android.app.Application;
 import android.test.ApplicationTestCase;
