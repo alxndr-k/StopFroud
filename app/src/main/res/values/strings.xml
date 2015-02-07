@@ -3,5 +3,6 @@
 
     <string name="app_name">StopFraud</string>
     <string name="mail_loading">Loading…</string>
+    <string name="title_activity_map">Map</string>
 
 </resources>
