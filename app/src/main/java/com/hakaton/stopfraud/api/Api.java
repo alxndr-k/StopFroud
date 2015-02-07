@@ -52,7 +52,7 @@ public class Api {
     }
 
     // TODO: we need current location, not last known
-    private static Location getLocation() {
+    public static Location getLocation() {
         LocationManager lm = (LocationManager) App.self.getSystemService(Context.LOCATION_SERVICE);
         List<String> providers = lm.getProviders(true);
 

@@ -1,16 +1,26 @@
 package com.hakaton.stopfraud.ui;
 
+import android.location.Address;
+import android.location.Geocoder;
+import android.location.Location;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
+import android.util.Log;
 
+import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptor;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.hakaton.stopfraud.R;
 import com.hakaton.stopfraud.api.Api;
 import com.hakaton.stopfraud.api.data.Status;
+
+import java.io.IOException;
+import java.util.List;
 
 import retrofit.Callback;
 import retrofit.RetrofitError;
@@ -49,17 +59,26 @@ public class MainActivity extends ActionBarActivity {
     }
 
     private void setUpMap() {
-        mMap.addMarker(new MarkerOptions().position(new LatLng(0, 0)).title("Marker")
-                .snippet("Marker Hint"));
+        Location location = Api.getLocation();
+        if (location == null)
+            return;
+        // TODO:
 
-//        Geocoder gc = new Geocoder(MapActivity.this);
-//        try {
-//            List<Address> addrs = gc.getFromLocation(0, 0, 3);
-//            for (Address addr : addrs)
-//                Log.i("SMTH2", addr.toString());
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
+        mMap.addMarker(new MarkerOptions().position(
+                new LatLng(location.getLatitude(),
+                           location.getLongitude())).title("Marker")
+                .snippet("Marker Hint"))
+                .setIcon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE));
+
+        Geocoder gc = new Geocoder(MainActivity.this);
+        try {
+            List<Address> addrs = gc.getFromLocation(0, 0, 3);
+            for (Address addr : addrs)
+                Log.i("SMTH2", addr.toString());
+        } catch (IOException e) {
+            Log.i("SMTH2", "Error");
+            e.printStackTrace();
+        }
 
         mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
             @Override
@@ -67,6 +86,9 @@ public class MainActivity extends ActionBarActivity {
                 return false;
             }
         });
+
+//        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(myLocation,
+//                Constants.MAP_ZOOM));
     }
 
     private Callback<Status> mStatusCallback = new Callback<Status>() {
