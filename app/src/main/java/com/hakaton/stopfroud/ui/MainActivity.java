@@ -1,12 +1,14 @@
-package com.hakaton.stopfroud;
+package com.hakaton.stopfroud.ui;
 
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.hakaton.stopfroud.R;
 
-public class ScanActivity extends ActionBarActivity {
+
+public class MainActivity extends ActionBarActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
