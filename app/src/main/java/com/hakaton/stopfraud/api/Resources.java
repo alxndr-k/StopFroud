@@ -1,7 +1,6 @@
 package com.hakaton.stopfraud.api;
 
 import com.hakaton.stopfraud.api.data.Status;
-import com.hakaton.stopfraud.api.data.Token;
 
 import retrofit.Callback;
 import retrofit.http.GET;
@@ -12,9 +11,9 @@ import retrofit.http.Query;
  */
 public interface Resources {
 
-    @GET("/point_status")
+    @GET("/point_status.json")
     void getPointStatus(@Query("long") double lon, @Query("lat") double lat, Callback<Status> callback);
 
-    @GET("/get_token")
-    void getToken(Callback<Token> callback);
+    @GET("/point_status.json")
+    void getPointStatus(Callback<Status> callback);
 }

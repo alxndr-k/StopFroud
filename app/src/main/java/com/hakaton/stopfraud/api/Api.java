@@ -15,7 +15,6 @@ import java.util.concurrent.TimeUnit;
 
 import retrofit.Callback;
 import retrofit.RestAdapter;
-import retrofit.client.OkClient;
 
 /**
  * Created by felistrs on 07.02.15.
@@ -31,9 +30,8 @@ public class Api {
         okHttpClient.setReadTimeout(2, TimeUnit.MINUTES);
 
         RestAdapter.Builder builder = new RestAdapter.Builder()
-                .setClient(new OkClient(okHttpClient))
-                .setEndpoint("http://inprogress.com.ua/api/avia-ws");
-
+//                .setClient(new OkClient(okHttpClient))
+                .setEndpoint("http://192.168.10.64/api/v1");
         if (BuildConfig.DEBUG) {
             builder.setLog(new RestLogger());
             builder.setLogLevel(RestAdapter.LogLevel.FULL);
@@ -44,10 +42,12 @@ public class Api {
     }
 
     public static void getStatus(Callback<Status> callback) {
-        getStatus(getLocation(), callback);
+        api.getPointStatus(callback);
+//        getStatus(getLocation(), callback);
     }
 
     public static void getStatus(Location l, Callback<Status> callback) {
+        if (l == null) return;
         api.getPointStatus(l.getLongitude(), l.getLatitude(), callback);
     }
 
