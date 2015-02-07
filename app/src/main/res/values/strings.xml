@@ -3,6 +3,8 @@
 
     <string name="app_name">StopFraud</string>
     <string name="mail_loading">Loading…</string>
-    <string name="title_activity_map">Map</string>
+    <string name="api_location_unavailable">Location is unavailable</string>
+    <string name="menu_refresh">Refresh</string>
+    <string name="your_location">Your location</string>
 
 </resources>

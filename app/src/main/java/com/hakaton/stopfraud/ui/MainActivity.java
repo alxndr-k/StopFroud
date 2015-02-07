@@ -1,11 +1,9 @@
 package com.hakaton.stopfraud.ui;
 
-import android.location.Address;
-import android.location.Geocoder;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
-import android.util.Log;
+import android.view.Menu;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -13,13 +11,12 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.hakaton.stopfraud.R;
 import com.hakaton.stopfraud.api.Api;
-import com.hakaton.stopfraud.api.data.Status;
+import com.hakaton.stopfraud.api.data.Point;
 
-import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import retrofit.Callback;
@@ -36,13 +33,67 @@ public class MainActivity extends ActionBarActivity {
         setContentView(R.layout.a_map);
         setUpMapIfNeeded();
 
-        Api.getStatus(mStatusCallback);
+        //Api.getPoints(mPointsCallback);
+
+        List<Point> points = new ArrayList<>();
+
+        {
+            Point p = new Point();
+            p.name = "name 1";
+            p.latitude = 50.4397093 - 0.002;
+            p.longitude = 30.5150826 - 0.002;
+            p.id = 0;
+            p.description = "desc 1";
+            p.state = Point.STATE_FAKE;
+            points.add(p);
+        }
+
+        {
+            Point p = new Point();
+            p.name = "name 2";
+            p.latitude = 50.4397093 - 0.003;
+            p.longitude = 30.5150826 - 0.002;
+            p.id = 1;
+            p.description = "desc 2";
+            p.state = Point.STATE_IN_PROGRESS;
+            points.add(p);
+        }
+
+        {
+            Point p = new Point();
+            p.name = "name 3";
+            p.latitude = 50.4397093 + 0.000;
+            p.longitude = 30.5150826 + 0.003;
+            p.id = 2;
+            p.description = "desc 3";
+            p.state = Point.STATE_VERIFIED;
+            points.add(p);
+        }
+
+        {
+            Point p = new Point();
+            p.name = "name 4";
+            p.latitude = 50.4397093 + 0.001;
+            p.longitude = 30.5150826 + 0.001;
+            p.id = 3;
+            p.description = "desc 4";
+            p.state = Point.STATE_VERIFIED;
+            points.add(p);
+        }
+
+        mPointsCallback.success(points, null);
     }
 
     @Override
     protected void onResume() {
         super.onResume();
         setUpMapIfNeeded();
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.main, menu);
+        return super.onCreateOptionsMenu(menu);
     }
 
     private void setUpMapIfNeeded() {
@@ -60,41 +111,44 @@ public class MainActivity extends ActionBarActivity {
 
     private void setUpMap() {
         Location location = Api.getLocation();
-        if (location == null)
+        if (location == null) {
             return;
-        // TODO:
+        }
+        // TODO: remove return. Zoom to locations
+
+        LatLng latLng = new LatLng(location.getLatitude(),
+                location.getLongitude());
 
         mMap.addMarker(new MarkerOptions().position(
-                new LatLng(location.getLatitude(),
-                           location.getLongitude())).title("Marker")
-                .snippet("Marker Hint"))
-                .setIcon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE));
+                latLng).title(this.getString(R.string.your_location)))
+                .setIcon(BitmapDescriptorFactory.fromResource(R.drawable.ic_maps_indicator_current_position));
 
-        Geocoder gc = new Geocoder(MainActivity.this);
-        try {
-            List<Address> addrs = gc.getFromLocation(0, 0, 3);
-            for (Address addr : addrs)
-                Log.i("SMTH2", addr.toString());
-        } catch (IOException e) {
-            Log.i("SMTH2", "Error");
-            e.printStackTrace();
-        }
-
-        mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
-            @Override
-            public boolean onMarkerClick(Marker marker) {
-                return false;
-            }
-        });
-
-//        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(myLocation,
-//                Constants.MAP_ZOOM));
+        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 14.f));
     }
 
-    private Callback<Status> mStatusCallback = new Callback<Status>() {
+    private Callback<List<Point>> mPointsCallback = new Callback<List<Point>>() {
         @Override
-        public void success(Status status, Response response) {
+        public void success(List<Point> points, Response response) {
+            for (Point point : points) {
+                BitmapDescriptor bitmap = null;
+                switch (point.state) {
+                    case Point.STATE_IN_PROGRESS:
+                        bitmap = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE);
+                        break;
+                    case Point.STATE_VERIFIED:
+                        bitmap = BitmapDescriptorFactory.defaultMarker(
+                                (BitmapDescriptorFactory.HUE_GREEN + BitmapDescriptorFactory.HUE_CYAN) / 2);
+                        break;
+                    case Point.STATE_FAKE:
+                        bitmap = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED);
+                        break;
+                }
 
+                LatLng latLng = new LatLng(point.latitude, point.longitude);
+                mMap.addMarker(new MarkerOptions().position(
+                        latLng).title(point.name).snippet(point.description))
+                        .setIcon(bitmap);
+            }
         }
 
         @Override

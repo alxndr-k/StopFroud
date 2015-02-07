@@ -7,6 +7,8 @@ import android.util.Log;
 
 import com.hakaton.stopfraud.App;
 import com.hakaton.stopfraud.BuildConfig;
+import com.hakaton.stopfraud.R;
+import com.hakaton.stopfraud.api.data.Point;
 import com.hakaton.stopfraud.api.data.Status;
 import com.squareup.okhttp.OkHttpClient;
 
@@ -15,6 +17,7 @@ import java.util.concurrent.TimeUnit;
 
 import retrofit.Callback;
 import retrofit.RestAdapter;
+import retrofit.client.OkClient;
 
 /**
  * Created by felistrs on 07.02.15.
@@ -30,7 +33,7 @@ public class Api {
         okHttpClient.setReadTimeout(2, TimeUnit.MINUTES);
 
         RestAdapter.Builder builder = new RestAdapter.Builder()
-//                .setClient(new OkClient(okHttpClient))
+                .setClient(new OkClient(okHttpClient))
                 .setEndpoint("http://192.168.10.64/api/v1");
         if (BuildConfig.DEBUG) {
             builder.setLog(new RestLogger());
@@ -41,14 +44,23 @@ public class Api {
         api = adapter.create(Resources.class);
     }
 
-    public static void getStatus(Callback<Status> callback) {
-        api.getPointStatus(callback);
-//        getStatus(getLocation(), callback);
+    public static void getPoints(Callback<List<Point>> callback) {
+        Location location = getLocation();
+        if (location == null) {
+            App.showToast(R.string.api_location_unavailable);
+            return;
+        }
+        api.getPoints(location.getLongitude(), location.getLatitude(), callback);
     }
 
-    public static void getStatus(Location l, Callback<Status> callback) {
-        if (l == null) return;
-        api.getPointStatus(l.getLongitude(), l.getLatitude(), callback);
+    public static void getStatus(Callback<Status> callback) {
+        Location location = getLocation();
+        if (location == null) {
+            App.showToast(R.string.api_location_unavailable);
+            return;
+        }
+
+        api.getPointStatus(location.getLongitude(), location.getLatitude(), callback);
     }
 
     // TODO: we need current location, not last known
