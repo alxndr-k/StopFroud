@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.v7.app.ActionBarActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -17,6 +18,8 @@ import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.zxing.integration.android.IntentIntegrator;
+import com.google.zxing.integration.android.IntentResult;
 import com.hakaton.stopfraud.R;
 import com.hakaton.stopfraud.api.Api;
 import com.hakaton.stopfraud.api.data.Point;
@@ -29,17 +32,19 @@ import retrofit.Callback;
 import retrofit.RetrofitError;
 import retrofit.client.Response;
 
-public class MainActivity extends ActionBarActivity implements View.OnClickListener {
+import static com.google.zxing.integration.android.IntentIntegrator.*;
 
+public class MainActivity extends ActionBarActivity implements View.OnClickListener {
     private static final int REQUEST_IMAGE_CAPTURE = 0;
     private GoogleMap mMap; // Might be null if Google Play services APK is not available.
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.a_map);
+        setContentView(R.layout.f_map);
 
         findViewById(R.id.add).setOnClickListener(this);
+        setUpMapIfNeeded();
 
         //Api.getPoints(mPointsCallback);
 
@@ -90,6 +95,13 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         }
 
         mPointsCallback.success(points, null);
+
+        findViewById(R.id.TEMP).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                initiateScan(MainActivity.this);
+            }
+        });
     }
 
     @Override
@@ -197,4 +209,5 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
 
         }
     };
+
 }
