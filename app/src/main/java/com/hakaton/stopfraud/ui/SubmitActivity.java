@@ -9,10 +9,17 @@ import android.media.ExifInterface;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.TextView;
 
+import com.hakaton.stopfraud.App;
 import com.hakaton.stopfraud.R;
+import com.hakaton.stopfraud.api.Api;
 
 import java.io.IOException;
+
+import retrofit.Callback;
+import retrofit.RetrofitError;
+import retrofit.client.Response;
 
 /**
  * Created by felistrs on 08.02.15.
@@ -26,6 +33,7 @@ public class SubmitActivity extends BaseActivity implements View.OnClickListener
     }
 
     private View mSubmit, mProgress;
+    private TextView mName;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,6 +43,7 @@ public class SubmitActivity extends BaseActivity implements View.OnClickListener
         mSubmit = findViewById(R.id.submit);
         mSubmit.setOnClickListener(this);
         mProgress = findViewById(R.id.progress);
+        mName = (TextView) findViewById(R.id.name);
 
         ImageView image = (ImageView) findViewById(R.id.image);
         image.setImageBitmap(getImage(getIntent().getStringExtra("image_uri"), image.getWidth(), image.getHeight()));
@@ -44,6 +53,19 @@ public class SubmitActivity extends BaseActivity implements View.OnClickListener
     public void onClick(View v) {
         mProgress.setVisibility(View.VISIBLE);
         mSubmit.setVisibility(View.INVISIBLE);
+        Api.submitPoint(mName.getText().toString(), new Callback<Response>() {
+            @Override
+            public void success(Response response, Response response2) {
+                App.showToast(R.string.submit_successful);
+                finish();
+            }
+
+            @Override
+            public void failure(RetrofitError error) {
+                App.showToast(R.string.submit_failed);
+                finish();
+            }
+        });
     }
 
     public static Bitmap getImage(String uri, int w, int h) {

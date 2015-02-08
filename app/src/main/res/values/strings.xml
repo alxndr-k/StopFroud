@@ -8,5 +8,7 @@
     <string name="your_location">Your location</string>
     <string name="submit_submit">Submit</string>
     <string name="submit_title">Submit point to review</string>
+    <string name="submit_successful">Point is submitted</string>
+    <string name="submit_failed">Network error</string>
 
 </resources>
