@@ -10,5 +10,6 @@
     <string name="submit_title">Submit point to review</string>
     <string name="submit_successful">Point is submitted</string>
     <string name="submit_failed">Network error</string>
+    <string name="main_failed">Network issue</string>
 
 </resources>

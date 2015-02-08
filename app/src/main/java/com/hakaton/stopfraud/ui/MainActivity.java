@@ -17,12 +17,12 @@ import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.hakaton.stopfraud.App;
 import com.hakaton.stopfraud.R;
 import com.hakaton.stopfraud.api.Api;
 import com.hakaton.stopfraud.api.data.Point;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.List;
 
 import retrofit.Callback;
@@ -32,6 +32,7 @@ import retrofit.client.Response;
 public class MainActivity extends BaseActivity implements View.OnClickListener {
 
     private static final int REQUEST_IMAGE_CAPTURE = 0;
+    private static final int REQUEST_SUBMIT_POINT = 1;
     private GoogleMap mMap; // Might be null if Google Play services APK is not available.
 
     @Override
@@ -42,55 +43,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
         findViewById(R.id.add).setOnClickListener(this);
 
         setUpMapIfNeeded();
-        //Api.getPoints(mPointsCallback);
-
-        List<Point> points = new ArrayList<>();
-
-        {
-            Point p = new Point();
-            p.name = "name 1";
-            p.latitude = 50.4397093 - 0.002;
-            p.longitude = 30.5150826 - 0.002;
-            p.id = 0;
-            p.description = "desc 1";
-            p.state = Point.STATE_FAKE;
-            points.add(p);
-        }
-
-        {
-            Point p = new Point();
-            p.name = "name 2";
-            p.latitude = 50.4397093 - 0.003;
-            p.longitude = 30.5150826 - 0.002;
-            p.id = 1;
-            p.description = "desc 2";
-            p.state = Point.STATE_IN_PROGRESS;
-            points.add(p);
-        }
-
-        {
-            Point p = new Point();
-            p.name = "name 3";
-            p.latitude = 50.4397093 + 0.000;
-            p.longitude = 30.5150826 + 0.003;
-            p.id = 2;
-            p.description = "desc 3";
-            p.state = Point.STATE_VERIFIED;
-            points.add(p);
-        }
-
-        {
-            Point p = new Point();
-            p.name = "name 4";
-            p.latitude = 50.4397093 + 0.001;
-            p.longitude = 30.5150826 + 0.001;
-            p.id = 3;
-            p.description = "desc 4";
-            p.state = Point.STATE_VERIFIED;
-            points.add(p);
-        }
-
-        mPointsCallback.success(points, null);
+        Api.getPoints(mPointsCallback);
     }
 
     @Override
@@ -117,8 +70,10 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
-            startActivity(SubmitActivity.newIntent(this, getCapturedFile().getAbsolutePath()));
+            startActivityForResult(SubmitActivity.newIntent(this, getCapturedFile().getAbsolutePath()), REQUEST_SUBMIT_POINT);
             overridePendingTransition(R.anim.slide_to_left_show_in, R.anim.slide_to_left_show_out);
+        } else if (requestCode == REQUEST_SUBMIT_POINT) {
+            Api.getPoints(mPointsCallback);
         }
         super.onActivityResult(requestCode, resultCode, data);
     }
@@ -195,7 +150,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
 
         @Override
         public void failure(RetrofitError error) {
-
+            App.showToast(R.string.main_failed);
         }
     };
 }

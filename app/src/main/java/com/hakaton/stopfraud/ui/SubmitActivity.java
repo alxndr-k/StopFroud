@@ -7,9 +7,11 @@ import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
 import android.media.ExifInterface;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.TextView;
 
 import com.hakaton.stopfraud.App;
 import com.hakaton.stopfraud.R;
@@ -33,7 +35,7 @@ public class SubmitActivity extends BaseActivity implements View.OnClickListener
     }
 
     private View mSubmit, mProgress;
-    private TextView mName;
+    private EditText mName;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,7 +45,9 @@ public class SubmitActivity extends BaseActivity implements View.OnClickListener
         mSubmit = findViewById(R.id.submit);
         mSubmit.setOnClickListener(this);
         mProgress = findViewById(R.id.progress);
-        mName = (TextView) findViewById(R.id.name);
+        mName = (EditText) findViewById(R.id.name);
+        mName.addTextChangedListener(mTextWatcher);
+        mName.setSelected(false);
 
         ImageView image = (ImageView) findViewById(R.id.image);
         image.setImageBitmap(getImage(getIntent().getStringExtra("image_uri"), image.getWidth(), image.getHeight()));
@@ -124,4 +128,21 @@ public class SubmitActivity extends BaseActivity implements View.OnClickListener
         bitmap.recycle();
         return bmRotated;
     }
+
+    private TextWatcher mTextWatcher = new TextWatcher() {
+        @Override
+        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+        }
+
+        @Override
+        public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+        }
+
+        @Override
+        public void afterTextChanged(Editable s) {
+            mSubmit.setSelected(s.length() > 0);
+        }
+    };
 }
