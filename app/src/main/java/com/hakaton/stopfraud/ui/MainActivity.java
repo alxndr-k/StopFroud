@@ -19,7 +19,6 @@ import com.hakaton.stopfraud.api.Api;
 import com.hakaton.stopfraud.api.data.Point;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.List;
 
 import retrofit.Callback;
@@ -105,19 +104,9 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
     }
 
     private String getImagePath() {
-        try {
-            File image = File.createTempFile(
-                    "capture",  /* prefix */
-                    ".jpg",         /* suffix */
-                    Environment.getExternalStoragePublicDirectory(
-                            Environment.DIRECTORY_PICTURES)      /* directory */
-            );
-            return image.getAbsolutePath();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        return "";
+        File image = new File(Environment.getExternalStoragePublicDirectory(
+                Environment.DIRECTORY_PICTURES), "capture.jpg");
+        return image.getAbsolutePath();
     }
 
     private Callback<List<Point>> mPointsCallback = new Callback<List<Point>>() {

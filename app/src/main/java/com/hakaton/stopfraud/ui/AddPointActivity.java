@@ -16,7 +16,7 @@ public class AddPointActivity extends Activity {
 
     public static Intent newIntent(Context context, String imageUrl) {
         Intent intent = new Intent(context, AddPointActivity.class);
-        intent.putExtra("image_url", imageUrl);
+        intent.putExtra("image_uri", imageUrl);
         return intent;
     }
 
