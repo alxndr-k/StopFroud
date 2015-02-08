@@ -51,7 +51,8 @@
         <activity
             android:name=".ui.SubmitActivity"
             android:label="@string/submit_title"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait"
+            android:parentActivityName=".ui.MainActivity"/>
 
         <meta-data
             android:name="com.google.android.gms.version"

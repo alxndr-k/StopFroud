@@ -7,7 +7,6 @@ import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
 import android.media.ExifInterface;
 import android.os.Bundle;
-import android.support.v7.app.ActionBarActivity;
 import android.view.View;
 import android.widget.ImageView;
 
@@ -18,7 +17,7 @@ import java.io.IOException;
 /**
  * Created by felistrs on 08.02.15.
  */
-public class SubmitActivity extends ActionBarActivity implements View.OnClickListener {
+public class SubmitActivity extends BaseActivity implements View.OnClickListener {
 
     public static Intent newIntent(Context context, String image) {
         Intent intent = new Intent(context, SubmitActivity.class);

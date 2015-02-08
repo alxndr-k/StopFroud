@@ -6,7 +6,6 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
-import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -30,7 +29,7 @@ import retrofit.Callback;
 import retrofit.RetrofitError;
 import retrofit.client.Response;
 
-public class MainActivity extends ActionBarActivity implements View.OnClickListener {
+public class MainActivity extends BaseActivity implements View.OnClickListener {
 
     private static final int REQUEST_IMAGE_CAPTURE = 0;
     private GoogleMap mMap; // Might be null if Google Play services APK is not available.
@@ -41,6 +40,7 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         setContentView(R.layout.a_map);
 
         findViewById(R.id.add).setOnClickListener(this);
+
         setUpMapIfNeeded();
         //Api.getPoints(mPointsCallback);
 
@@ -116,8 +116,9 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == REQUEST_IMAGE_CAPTURE) {
+        if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
             startActivity(SubmitActivity.newIntent(this, getCapturedFile().getAbsolutePath()));
+            overridePendingTransition(R.anim.slide_to_left_show_in, R.anim.slide_to_left_show_out);
         }
         super.onActivityResult(requestCode, resultCode, data);
     }
@@ -128,6 +129,7 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
             takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(getCapturedFile()));
             startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
+            overridePendingTransition(R.anim.slide_to_left_show_in, R.anim.slide_to_left_show_out);
         }
     }
 
