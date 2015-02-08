@@ -2,11 +2,10 @@ package com.hakaton.stopfraud.ui;
 
 import android.content.Intent;
 import android.location.Location;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
-import android.support.v7.app.ActionBarActivity;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -18,8 +17,7 @@ import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.zxing.integration.android.IntentIntegrator;
-import com.google.zxing.integration.android.IntentResult;
+import com.hakaton.stopfraud.App;
 import com.hakaton.stopfraud.R;
 import com.hakaton.stopfraud.api.Api;
 import com.hakaton.stopfraud.api.data.Point;
@@ -32,10 +30,13 @@ import retrofit.Callback;
 import retrofit.RetrofitError;
 import retrofit.client.Response;
 
-import static com.google.zxing.integration.android.IntentIntegrator.*;
+import static com.google.zxing.integration.android.IntentIntegrator.initiateScan;
 
-public class MainActivity extends ActionBarActivity implements View.OnClickListener {
+
+public class MainActivity extends BaseActivity implements View.OnClickListener {
+
     private static final int REQUEST_IMAGE_CAPTURE = 0;
+    private static final int REQUEST_SUBMIT_POINT = 1;
     private GoogleMap mMap; // Might be null if Google Play services APK is not available.
 
     @Override
@@ -102,6 +103,10 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
                 initiateScan(MainActivity.this);
             }
         });
+
+        setUpMapIfNeeded();
+        Api.getPoints(mPointsCallback);
+
     }
 
     @Override
@@ -127,8 +132,11 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == REQUEST_IMAGE_CAPTURE) {
-            startActivity(AddPointActivity.newIntent(this, getImagePath()));
+        if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
+            startActivityForResult(SubmitActivity.newIntent(this, getCapturedFile().getAbsolutePath()), REQUEST_SUBMIT_POINT);
+            overridePendingTransition(R.anim.slide_to_left_show_in, R.anim.slide_to_left_show_out);
+        } else if (requestCode == REQUEST_SUBMIT_POINT) {
+            Api.getPoints(mPointsCallback);
         }
         super.onActivityResult(requestCode, resultCode, data);
     }
@@ -137,9 +145,9 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
     public void onClick(View v) {
         Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
-            takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, getImagePath());
-
+            takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(getCapturedFile()));
             startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
+            overridePendingTransition(R.anim.slide_to_left_show_in, R.anim.slide_to_left_show_out);
         }
     }
 
@@ -173,10 +181,9 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 14.f));
     }
 
-    private String getImagePath() {
-        File image = new File(Environment.getExternalStoragePublicDirectory(
+    private File getCapturedFile() {
+        return new File(Environment.getExternalStoragePublicDirectory(
                 Environment.DIRECTORY_PICTURES), "capture.jpg");
-        return image.getAbsolutePath();
     }
 
     private Callback<List<Point>> mPointsCallback = new Callback<List<Point>>() {
@@ -206,7 +213,7 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
 
         @Override
         public void failure(RetrofitError error) {
-
+            App.showToast(R.string.main_failed);
         }
     };
 

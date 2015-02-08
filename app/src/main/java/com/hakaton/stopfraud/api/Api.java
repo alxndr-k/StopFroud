@@ -10,6 +10,7 @@ import com.hakaton.stopfraud.BuildConfig;
 import com.hakaton.stopfraud.R;
 import com.hakaton.stopfraud.api.data.Point;
 import com.hakaton.stopfraud.api.data.Status;
+import com.hakaton.stopfraud.api.data.SubmitPoint;
 import com.squareup.okhttp.OkHttpClient;
 
 import java.util.List;
@@ -18,6 +19,7 @@ import java.util.concurrent.TimeUnit;
 import retrofit.Callback;
 import retrofit.RestAdapter;
 import retrofit.client.OkClient;
+import retrofit.client.Response;
 
 /**
  * Created by felistrs on 07.02.15.
@@ -51,6 +53,20 @@ public class Api {
             return;
         }
         api.getPoints(location.getLongitude(), location.getLatitude(), callback);
+    }
+
+    public static void submitPoint(String name, Callback<Response> callback) {
+        Location location = getLocation();
+        if (location == null) {
+            App.showToast(R.string.api_location_unavailable);
+            return;
+        }
+
+        SubmitPoint point = new SubmitPoint();
+        point.lat = location.getLatitude();
+        point.lon = location.getLongitude();
+        point.name = name;
+        api.submitPoint(point, callback);
     }
 
     public static void getStatus(Callback<Status> callback) {
