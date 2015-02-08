@@ -2,6 +2,7 @@ package com.hakaton.stopfraud.ui;
 
 import android.content.Intent;
 import android.location.Location;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
@@ -40,7 +41,7 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         setContentView(R.layout.a_map);
 
         findViewById(R.id.add).setOnClickListener(this);
-
+        setUpMapIfNeeded();
         //Api.getPoints(mPointsCallback);
 
         List<Point> points = new ArrayList<>();
@@ -116,7 +117,7 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == REQUEST_IMAGE_CAPTURE) {
-            startActivity(AddPointActivity.newIntent(this, getImagePath()));
+            startActivity(SubmitActivity.newIntent(this, getCapturedFile().getAbsolutePath()));
         }
         super.onActivityResult(requestCode, resultCode, data);
     }
@@ -125,8 +126,7 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
     public void onClick(View v) {
         Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
-            takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, getImagePath());
-
+            takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(getCapturedFile()));
             startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
         }
     }
@@ -161,10 +161,9 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 14.f));
     }
 
-    private String getImagePath() {
-        File image = new File(Environment.getExternalStoragePublicDirectory(
+    private File getCapturedFile() {
+        return new File(Environment.getExternalStoragePublicDirectory(
                 Environment.DIRECTORY_PICTURES), "capture.jpg");
-        return image.getAbsolutePath();
     }
 
     private Callback<List<Point>> mPointsCallback = new Callback<List<Point>>() {
