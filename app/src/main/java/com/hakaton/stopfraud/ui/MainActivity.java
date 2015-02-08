@@ -1,6 +1,7 @@
 package com.hakaton.stopfraud.ui;
 
 import android.content.Intent;
+import android.location.Location;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
@@ -9,16 +10,19 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
+import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptor;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.hakaton.stopfraud.R;
 import com.hakaton.stopfraud.api.Api;
 import com.hakaton.stopfraud.api.data.Point;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 
 import retrofit.Callback;
@@ -34,10 +38,58 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.a_map);
-        setUpMapIfNeeded();
 
         findViewById(R.id.add).setOnClickListener(this);
-//        Api.getPoints(mPointsCallback);
+
+        //Api.getPoints(mPointsCallback);
+
+        List<Point> points = new ArrayList<>();
+
+        {
+            Point p = new Point();
+            p.name = "name 1";
+            p.latitude = 50.4397093 - 0.002;
+            p.longitude = 30.5150826 - 0.002;
+            p.id = 0;
+            p.description = "desc 1";
+            p.state = Point.STATE_FAKE;
+            points.add(p);
+        }
+
+        {
+            Point p = new Point();
+            p.name = "name 2";
+            p.latitude = 50.4397093 - 0.003;
+            p.longitude = 30.5150826 - 0.002;
+            p.id = 1;
+            p.description = "desc 2";
+            p.state = Point.STATE_IN_PROGRESS;
+            points.add(p);
+        }
+
+        {
+            Point p = new Point();
+            p.name = "name 3";
+            p.latitude = 50.4397093 + 0.000;
+            p.longitude = 30.5150826 + 0.003;
+            p.id = 2;
+            p.description = "desc 3";
+            p.state = Point.STATE_VERIFIED;
+            points.add(p);
+        }
+
+        {
+            Point p = new Point();
+            p.name = "name 4";
+            p.latitude = 50.4397093 + 0.001;
+            p.longitude = 30.5150826 + 0.001;
+            p.id = 3;
+            p.description = "desc 4";
+            p.state = Point.STATE_VERIFIED;
+            points.add(p);
+        }
+
+        mPointsCallback.success(points, null);
     }
 
     @Override
@@ -93,14 +145,20 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
     }
 
     private void setUpMap() {
-        mMap.addMarker(new MarkerOptions().position(new LatLng(0, 0)).title("Marker").snippet("Marker Hint"));
+        Location location = Api.getLocation();
+        if (location == null) {
+            return;
+        }
+        // TODO: remove return. Zoom to locations
 
-        mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
-            @Override
-            public boolean onMarkerClick(Marker marker) {
-                return false;
-            }
-        });
+        LatLng latLng = new LatLng(location.getLatitude(),
+                location.getLongitude());
+
+        mMap.addMarker(new MarkerOptions().position(
+                latLng).title(this.getString(R.string.your_location)))
+                .setIcon(BitmapDescriptorFactory.fromResource(R.drawable.ic_maps_indicator_current_position));
+
+        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 14.f));
     }
 
     private String getImagePath() {
@@ -112,7 +170,26 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
     private Callback<List<Point>> mPointsCallback = new Callback<List<Point>>() {
         @Override
         public void success(List<Point> points, Response response) {
+            for (Point point : points) {
+                BitmapDescriptor bitmap = null;
+                switch (point.state) {
+                    case Point.STATE_IN_PROGRESS:
+                        bitmap = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE);
+                        break;
+                    case Point.STATE_VERIFIED:
+                        bitmap = BitmapDescriptorFactory.defaultMarker(
+                                (BitmapDescriptorFactory.HUE_GREEN + BitmapDescriptorFactory.HUE_CYAN) / 2);
+                        break;
+                    case Point.STATE_FAKE:
+                        bitmap = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED);
+                        break;
+                }
 
+                LatLng latLng = new LatLng(point.latitude, point.longitude);
+                mMap.addMarker(new MarkerOptions().position(
+                        latLng).title(point.name).snippet(point.description))
+                        .setIcon(bitmap);
+            }
         }
 
         @Override

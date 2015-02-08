@@ -6,19 +6,25 @@ import com.google.gson.annotations.SerializedName;
  * Created by felistrs on 07.02.15.
  */
 public class Point {
+    public static final int STATE_IN_PROGRESS = 0;
+    public static final int STATE_VERIFIED = 1;
+    public static final int STATE_FAKE = 2;
 
     @SerializedName("id")
-    private int mId;
+    public int id;
 
     @SerializedName("name")
-    private String mName;
+    public String name;
 
     @SerializedName("description")
-    private String mDescription;
+    public String description;
 
     @SerializedName("long")
-    private double mLongitude;
+    public double longitude;
 
     @SerializedName("lat")
-    private double mLatitude;
+    public double latitude;
+
+    @SerializedName("state")
+    public int state;
 }
