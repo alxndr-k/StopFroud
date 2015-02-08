@@ -30,9 +30,6 @@ import retrofit.Callback;
 import retrofit.RetrofitError;
 import retrofit.client.Response;
 
-import static com.google.zxing.integration.android.IntentIntegrator.initiateScan;
-
-
 public class MainActivity extends BaseActivity implements View.OnClickListener {
 
     private static final int REQUEST_IMAGE_CAPTURE = 0;
@@ -97,16 +94,8 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
 
         mPointsCallback.success(points, null);
 
-        findViewById(R.id.TEMP).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                initiateScan(MainActivity.this);
-            }
-        });
-
         setUpMapIfNeeded();
         Api.getPoints(mPointsCallback);
-
     }
 
     @Override
